@@ -1,6 +1,6 @@
 <template>
   <div class="modal-wrap">
-    <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#openModal">Add Task</button>
+    <!-- <button class="btn btn-primary btn-block" data-toggle="modal" data-target="#openModal">Add Task</button> -->
     <!-- Modal -->
     <div
       class="modal fade"
@@ -13,7 +13,7 @@
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h5 class="modal-title" id="openModalLabel">Add task</h5>
+            <h5 class="modal-title" id="openModalLabel">{{modalTitle}}</h5>
             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>
@@ -59,7 +59,7 @@
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            <button type="button" class="btn btn-primary" @click="addTodo">Add todo</button>
+            <button type="button" class="btn btn-primary" @click="submit">Submit</button>
           </div>
         </div>
       </div>
@@ -70,19 +70,16 @@
 <script>
 export default {
   props: {
-      todo: Object
+      todo: Object,
+      modalTitle: String
   },
   data() {
     return {
-    //   todo: {
-    //     id: null,
-    //     title: "",
-    //     description: "",
-    //     filters: [],
-    //     labels: []
-    //   },
       isModal: false
     };
+  },
+  mounted(){
+      
   },
   methods: {
     addFilter(filter) {
@@ -92,7 +89,7 @@ export default {
         this.todo.filters.splice(this.todo.filters.indexOf(filter), 1);
       }
     },
-    addTodo() {
+    submit() {
       let tmp = [];
       this.todo.labels.forEach(item => {
         this.allLabels.forEach(label => {
@@ -118,7 +115,7 @@ export default {
   computed: {
     allLabels() {
       return this.$store.state.allLabels;
-    }
+    },    
   }
 };
 </script>

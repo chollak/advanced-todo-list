@@ -1,75 +1,275 @@
 <template>
-  <div class="container">
-    <div class="row">
-      <div class="col-md-3">
-        <div class="sidebar">
-          <div class="sidebar__section">
-            <Modal :todo="todo"/>
-            <div class="sidebar-menu">
-              <div class="sidebar-menu__item">
-                <img src alt />
-                <span @click="currentFilter='all'">All</span>
-              </div>
-            </div>
-          </div>
-          <div class="sidebar__section">
-            <div class="sidebar__header">
-              <h5>Filters</h5>
-            </div>
-            <div class="sidebar-menu filters">
-              <div
-                class="sidebar-menu__item filter"
-                v-for="filter in allFilters"
-                :key="filter.name"
+  <div class="todo-wrapper">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-3">
+          <div class="sidebar">
+            <div class="sidebar-section mb-5 pb-5">
+              <button
+                class="btn btn-primary btn-block mb-3"
+                data-toggle="modal"
+                data-target="#openModal"
+              >Add Task</button>
+              <a
+                href="#"
+                class="sidebar-menu-item d-flex"
+                :class="{active: currentCategory=='all'}"
+                @click="setCurrentCategory('all')"
               >
-                <img :src="filter.img" alt />
-                <span @click="setFilter(filter.name)">{{filter.name}}</span>
+                <span>All</span>
+              </a>
+            </div>
+            <div class="sidebar-section mb-5 pb-5">
+              <div class="sidebar-menu">
+                <h5>Filters</h5>
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  v-for="(filter, index) in filters"
+                  :key="index"
+                  :class="{active: currentCategory==filter}"
+                  @click="setCurrentCategory(filter)"
+                >
+                  <span>{{filter}}</span>
+                </a>
               </div>
             </div>
-          </div>
-          <div class="sidebar__section">
-            <div class="sidebar__header">
-              <h5>Labels</h5>
+            <!-- /.sidebar-section -->
+            <div class="sidebar-section mb-5 pb-5">
+              <div class="sidebar-menu">
+                <h5>Labels</h5>
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  v-for="(label, index) in labels"
+                  :key="index"
+                  :class="{active: currentCategory==label}"
+                  @click="setCurrentCategory(label)"
+                >
+                  <span>{{label}}</span>
+                </a>
+              </div>
             </div>
-            <div class="sidebar-menu labels">
-              <div class="sidebar-menu__item label" v-for="label in allLabels" :key="label.name">
-                <span :class="[label.color]" class="label-icon"></span>
-                <span @click="setFilter(label.name)">{{label.name}}</span>
+            <!-- /.sidebar-section -->
+          </div>
+        </div>
+        <div class="col-md-9">
+          <div class="todo-main">
+            <div class="input-group input-group-sm mb-3">
+              <input type="text" class="form-control" placeholder="Search" v-model="search" />
+            </div>
+          </div>
+          <div class="todos">
+            <div
+              class="todo-item"
+              v-for="todo in searchTodos"
+              :key="todo.id"
+              @click="updateTodo(todo.id)"
+              data-toggle="modal"
+              data-target="#openModal"
+            >
+              <div class="todo-header d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center">
+                  <input
+                    type="checkbox"
+                    :value="todo.id"
+                    :checked="isFilter(todo.filters,'completed')"
+                    @change="setFilter(todo.id,'completed')"
+                    @click.self.stop
+                  />
+                  <span
+                    class="todo-title mr-3 ml-2"
+                    :class="{'text-del':isFilter(todo.filters,'completed')}"
+                  >{{todo.title}}</span>
+                  <div class="todo-labels d-flex">
+                    <span
+                      class="badge badge-pill badge-light mr-1"
+                      v-for="label in todo.labels"
+                      :key="label"
+                    >{{label}}</span>
+                  </div>
+                </div>
+                <div class="todo-filters d-flex" @click.stop="updateTodo(todo.id)">
+                  <span
+                    class="todo-filter"
+                    :class="{'text-warning': isFilter(todo.filters,'starred')}"
+                    @click="setFilter(todo.id,'starred')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                  </span>
+                  <span
+                    class="todo-filter"
+                    :class="{'text-success': isFilter(todo.filters,'important')}"
+                    @click="setFilter(todo.id,'important')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12" y2="8" />
+                    </svg>
+                  </span>
+                  <span
+                    class="filter-todo"
+                    @click="setFilter(todo.id,'trashed')"
+                    v-if="todo.filters.indexOf('trashed')==-1"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polyline points="3 6 5 6 21 6" />
+                      <path
+                        d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                      />
+                    </svg>
+                  </span>
+                </div>
+              </div>
+              <div class="todo-body" :class="{'text-del':isFilter(todo.filters,'completed')}">
+                <p>{{todo.description}}</p>
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-9 main-todo">
-        <input type="text" class="form-control mb-3" placeholder="search" />
-        <div class="list-group">
-          <a
-            href="#"
-            class="list-group-item list-group-item-action"
-            v-for="todo in filteredTodos"
-            :key="todo.id"
-            @click="setTodo(todo)"            
-          >
-            <div class="d-flex w-100 justify-content-between">
-              <h5 class="mb-1">{{todo.title}}</h5>
-              <small>
-                <img src="/static/images/starred.svg" alt="Starred" />
-                <img src="/static/images/important.svg" alt="Important" />
-                <img src="/static/images/trashed.svg" alt="Trashed" />
-              </small>
+    </div>
+
+    <div
+      class="modal fade"
+      id="openModal"
+      tabindex="-1"
+      role="dialog"
+      aria-labelledby="openModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="openModalLabel">Title</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <div class="d-flex justify-content-between mb-2">
+              <div>
+                <input
+                  v-if="isUpdate"
+                  type="checkbox"
+                  :value="newTodo.id"
+                  :checked="isFilter(newTodo.filters,'completed')"
+                  @change="setNewFilter('completed')"
+                />
+              </div>
+              <ul>
+                <li>
+                  <span
+                    class="todo-filter"
+                    :class="{'text-warning': isFilter(newTodo.filters,'starred')}"
+                    @click="setNewFilter('starred')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <polygon
+                        points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                      />
+                    </svg>
+                  </span>
+                </li>
+                <li>
+                  <span
+                    class="todo-filter"
+                    :class="{'text-success': isFilter(newTodo.filters,'important')}"
+                    @click="setNewFilter('important')"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="16" x2="12" y2="12" />
+                      <line x1="12" y1="8" x2="12" y2="8" />
+                    </svg>
+                  </span>
+                </li>
+                <li>
+                  <img src="/static/images/tag.svg" alt />
+                  <ul class="d-dropdown">
+                    <li v-for="label in labels" :key="label">
+                      <input :id="label" type="checkbox" :value="label" v-model="newTodo.labels" />
+                      <label :for="label">{{label}}</label>
+                    </li>
+                  </ul>
+                </li>
+              </ul>
             </div>
-            <p class="mb-1">{{todo.description}}</p>
-            <small>
-              <span
-                class="badge badge-pill badge-light"
-                v-for="label in todo.labels"
-                :key="label.name"
-              >
-                <!-- <span class="label-icon" :class="[label.color]"></span> -->
-                {{label.name}}
-              </span>
-            </small>
-          </a>
+            <input
+              type="text"
+              class="form-control mb-2"
+              placeholder="Title"
+              v-model="newTodo.title"
+            />
+            <textarea
+              name
+              id
+              cols="30"
+              rows="10"
+              class="form-control"
+              placeholder="Add description"
+              v-model="newTodo.description"
+            ></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-primary" @click="submit()">Submit</button>
+          </div>
         </div>
       </div>
     </div>
@@ -77,107 +277,213 @@
 </template>
 
 <script>
-import Modal from "@/components/Modal.vue";
-
 export default {
   name: "todo",
-  components: {
-    Modal
-  },
   data() {
     return {
-      todo: {},
-      // todos: [
-      //   {
-      //     id:1,
-      //     title:"Test",
-      //     description:"ldlasdla",
-      //     filters:["starred"],
-      //     labels:[{name:"fsdfs",color:"sdfsdfsd"}],
-      //   }
-      // ]
-      currentFilter: "all"
+      filters: ["starred", "important", "completed", "trashed"],
+      labels: ["backend", "frontend", "doc", "bug"],
+      currentCategory: "all",
+
+      todos: [
+        // {
+        //   id: 0,
+        //   title: "Meet Mary",
+        //   description: "HEHEHHEHEHHEHEHE",
+        //   filters: ["starred", "completed"],
+        //   labels: ["doc", "bug"]
+        // },
+        // {
+        //   id: 1,
+        //   title: "Check Mail",
+        //   description: "EEEEEE",
+        //   filters: ["important"],
+        //   labels: ["doc", "backend"]
+        // }
+      ],
+
+      newTodo: {
+        id: null,
+        title: "",
+        description: "",
+        filters: [],
+        labels: []
+      },
+      isUpdate: false,
+      search: ""
     };
   },
-  mounted() {},
+  mounted() {
+    this.setTodos();
+    this.newTodo.id = this.todos.length;
+  },
+  methods: {
+    setTodos() {
+      let todos;
+      if (localStorage.getItem("todos-local")) {
+        todos = JSON.parse(localStorage.getItem("todos-local"));
+        this.todos = todos;
+      }
+    },
+    saveTodos() {
+      const parsed = JSON.stringify(this.todos);
+      localStorage.setItem("todos-local", parsed);
+    },
+    setCurrentCategory(category) {
+      this.currentCategory = category;
+    },
+    isFilter(filters, is) {
+      if (filters.indexOf(is) == -1) return false;
+      return true;
+    },
+
+    setFilter(id, filter) {
+      let todo = this.todos.find(todo => todo.id == id);
+      if (this.isFilter(todo.filters, filter)) {
+        todo.filters.splice(todo.filters.indexOf(filter), 1);
+      } else {
+        todo.filters.push(filter);
+      }
+      this.todos[this.todos.findIndex(item => item.id == id)] = todo;
+      this.saveTodos();
+    },
+    setNewFilter(filter) {
+      if (this.newTodo.filters.indexOf(filter) == -1) {
+        this.newTodo.filters.push(filter);
+      } else {
+        this.newTodo.filters.splice(this.newTodo.filters.indexOf(filter), 1);
+      }
+    },
+    updateTodo(id) {
+      let todo = this.todos.find(todo => todo.id == id);
+
+      this.newTodo = todo;
+      this.setTodos();
+      this.isUpdate = true;
+    },
+    submit() {
+      if (this.todos.findIndex(item => item.id == this.newTodo.id) != -1) {
+        this.todos.splice(
+          this.todos.findIndex(item => item.id == this.newTodo.id),
+          1,
+          this.newTodo
+        );
+      } else {
+        this.todos.push(this.newTodo);
+      }
+      this.clearData();
+      this.saveTodos();
+      this.setTodos();
+      this.isUpdate = false;
+    },
+    clearData() {
+      this.newTodo = {
+        id: this.todos.length,
+        title: "",
+        description: "",
+        filters: [],
+        labels: []
+      };
+    }
+  },
   computed: {
-    setModalTodo(){
-      return this.todos[0];
-    },
-    allFilters() {
-      return this.$store.state.allFilters;
-    },
-    allLabels() {
-      return this.$store.state.allLabels;
-    },
-    todos() {
-      return this.$store.state.todos;
+    searchTodos() {
+      return this.filteredTodos.filter(c => {
+        return c.title.toLowerCase().match(this.search.toLowerCase());
+      });
     },
     filteredTodos() {
       let obj = this.todos.filter(
         f =>
-          this.currentFilter == "all" ||
-          f.filters.indexOf(this.currentFilter) != -1 ||
-          f.labels.map(e => e.name).indexOf(this.currentFilter) != -1
-      );      
+          (this.currentCategory == "all" &&
+            f.filters.indexOf("trashed") == -1) ||
+          (f.filters.indexOf(this.currentCategory) != -1 &&
+            f.filters.indexOf("trashed") == -1) ||
+          (f.labels.indexOf(this.currentCategory) != -1 &&
+            f.filters.indexOf("trashed") == -1) ||
+          (this.currentCategory == "trashed" &&
+            f.filters.indexOf(this.currentCategory) != -1)
+      );
       return obj;
-    }
-  },
-  methods: {
-    setFilter(filterBy) {
-      this.currentFilter = filterBy;
-      console.log(this.filteredTodos);
-    },
-    setTodo(todo){
-      this.todo = todo;
     }
   }
 };
 </script>
 
-<style scoped>
-.sidebar, .main-todo {
-  /* background: #eaeaea; */
-  height: 500px;
-  overflow-y: scroll;
+<style>
+.sidebar-section {
+  border-bottom: #000 solid 1px;
 }
-.sidebar__section {
-  padding: 10px 15px;
-  /* background: #eaeaea; */
-  border: 1px #eaeaea solid;
+.sidebar-menu-item {
+  text-decoration: none;
+  color: #000;
+  padding: 5px 15px;
 }
-.sidebar__header {
-  padding: 0px 10px;
+.sidebar-menu-item:hover {
+  color: #000;
 }
-.sidebar-menu__item {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  /* background: red; */
-  padding: 5px 10px;
-  margin: 5px 0px;
+.sidebar .active {
+  color: #00b69e;
 }
-.label-icon {
-  /* width: 20px;
-  height: 20px; */
-  /* max-width: 100%;
-  max-height: 100%; */
-  width: 1px;
-  height: 1px;
-  border: 3px solid;
-  border-radius: 100%;
+.sidebar-menu-item img {
 }
 
-.l-primary {
-  border-color: rgb(115, 103, 240);
+.todo-header {
+  /* background: red;  */
+  padding: 5px 10px;
 }
-.l-success {
-  border-color: rgb(40, 199, 111);
+.todo-title {
+  font-size: 1.2rem;
+  font-weight: 500;
 }
-.l-warning {
-  border-color: rgb(255, 159, 67);
+.todo-item {
+  background: #eaeaea;
+  padding: 10px 15px;
 }
-.l-danger {
-  border-color: rgb(234, 84, 85);
+.text-del {
+  text-decoration: line-through;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding-left: 0;
+}
+
+li {
+  display: block;
+  float: left;
+  position: relative;
+  text-decoration: none;
+  transition-duration: 0.5s;
+}
+
+li:hover {
+  cursor: pointer;
+}
+
+ul li ul {
+  visibility: hidden;
+  opacity: 0;
+  min-width: 7rem;
+  position: absolute;
+  transition: all 0.5s ease;
+  /* margin-top: 1rem; */
+  right: 0;
+  display: none;
+  background: #eaeaea;
+  padding: 5px 10px;
+}
+
+ul li:hover > ul,
+ul li ul:hover {
+  visibility: visible;
+  opacity: 1;
+  display: block;
+}
+
+ul li ul li {
+  clear: both;
+  width: 100%;
 }
 </style>
