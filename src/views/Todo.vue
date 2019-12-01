@@ -1,12 +1,12 @@
 <template>
   <div class="todo-wrapper">
     <div class="container">
-      <div class="row">
+      <div class="row common">
         <div class="col-md-3">
           <div class="sidebar">
             <div class="sidebar-section mb-5 pb-5">
               <button
-                class="btn btn-primary btn-block mb-3"
+                class="btn btn-block mb-3 btn-primary"
                 data-toggle="modal"
                 data-target="#openModal"
               >Add Task</button>
@@ -16,13 +16,28 @@
                 :class="{active: currentCategory=='all'}"
                 @click="setCurrentCategory('all')"
               >
-                <span>All</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24px"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                  <polyline points="2 17 12 22 22 17" />
+                  <polyline points="2 12 12 17 22 12" />
+                </svg>
+                <span class="ml-3">All</span>
               </a>
             </div>
             <div class="sidebar-section mb-5 pb-5">
               <div class="sidebar-menu">
                 <h5>Filters</h5>
-                <a
+                <!-- <a
                   href="#"
                   class="sidebar-menu-item d-flex"
                   v-for="(filter, index) in filters"
@@ -30,7 +45,100 @@
                   :class="{active: currentCategory==filter}"
                   @click="setCurrentCategory(filter)"
                 >
-                  <span>{{filter}}</span>
+                <img :src="'/static/images/f-'+(index+1)+'.svg'" alt="">
+                  <span class="ml-3">{{filter}}</span>
+                </a>-->
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  @click="setCurrentCategory('starred')"
+                  :class="{active: currentCategory=='starred'}"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polygon
+                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                    />
+                  </svg>
+                  <span class="ml-3">Starred</span>
+                </a>
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  @click="setCurrentCategory('important')"
+                  :class="{active: currentCategory=='important'}"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="16" x2="12" y2="12" />
+                    <line x1="12" y1="8" x2="12" y2="8" />
+                  </svg>
+                  <span class="ml-3">Important</span>
+                </a>
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  @click="setCurrentCategory('completed')"
+                  :class="{active: currentCategory=='completed'}"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="feather feather-check h-6 w-6"
+                  >
+                    <polyline points="20 6 9 17 4 12" />
+                  </svg>
+                  <span class="ml-3">Completed</span>
+                </a>
+                <a
+                  href="#"
+                  class="sidebar-menu-item d-flex"
+                  @click="setCurrentCategory('trashed')"
+                  :class="{active: currentCategory=='trashed'}"
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24px"
+                    height="24px"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  >
+                    <polyline points="3 6 5 6 21 6" />
+                    <path
+                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                    />
+                  </svg>
+                  <span class="ml-3">Trashed</span>
                 </a>
               </div>
             </div>
@@ -40,12 +148,13 @@
                 <h5>Labels</h5>
                 <a
                   href="#"
-                  class="sidebar-menu-item d-flex"
+                  class="sidebar-menu-item d-flex align-items-center"
                   v-for="(label, index) in labels"
                   :key="index"
                   :class="{active: currentCategory==label}"
                   @click="setCurrentCategory(label)"
                 >
+                <span class="label-circle mr-4" :class="'label-'+label"></span>
                   <span>{{label}}</span>
                 </a>
               </div>
@@ -83,10 +192,12 @@
                   >{{todo.title}}</span>
                   <div class="todo-labels d-flex">
                     <span
-                      class="badge badge-pill badge-light mr-1"
+                      class="badge badge-pill badge-light mr-1 d-flex align-items-center"
                       v-for="label in todo.labels"
                       :key="label"
-                    >{{label}}</span>
+                    >
+                    <span class="label-circle label-dot mr-1" :class="'label-'+label"></span>
+                    {{label}}</span>
                   </div>
                 </div>
                 <div class="todo-filters d-flex" @click.stop="updateTodo(todo.id)">
@@ -282,25 +393,16 @@ export default {
   data() {
     return {
       filters: ["starred", "important", "completed", "trashed"],
+      // filters: [
+      //   { name: "starred" },
+      //   { name: "important" },
+      //   { name: "completed" },
+      //   { name: "trashed" }
+      // ],
       labels: ["backend", "frontend", "doc", "bug"],
       currentCategory: "all",
 
-      todos: [
-        // {
-        //   id: 0,
-        //   title: "Meet Mary",
-        //   description: "HEHEHHEHEHHEHEHE",
-        //   filters: ["starred", "completed"],
-        //   labels: ["doc", "bug"]
-        // },
-        // {
-        //   id: 1,
-        //   title: "Check Mail",
-        //   description: "EEEEEE",
-        //   filters: ["important"],
-        //   labels: ["doc", "backend"]
-        // }
-      ],
+      todos: [],
 
       newTodo: {
         id: null,
@@ -411,8 +513,58 @@ export default {
 </script>
 
 <style>
+
+.label-circle{
+  width: 10px;
+  height: 10px;
+  border: #000 solid 2px;
+  border-radius: 9999px;
+}
+.label-dot{
+  /* width: 100% !important; */
+  /* width: 10px;
+  height: 100% !important; */
+  width: 4px;
+  height: 4px;
+  display: block !important;
+}
+    /* --vs-primary: 115,103,240;
+    --vs-success: 40,199,111;
+    --vs-danger: 234,84,85;
+    --vs-warning: 255,159,67; */
+.label-backend{
+  border-color: rgb(115,103,240);
+}
+.label-frontend{
+  border-color: rgb(255,159,67);
+}
+.label-doc{
+  border-color: rgb(40,199,111);
+}
+.label-bug{
+  border-color: rgb(234,84,85);
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: rgba(115, 103, 240, 1) !important;
+  border-color: rgba(115, 103, 240, 1) !important;
+}
+.btn-primary:hover {
+  box-shadow: 0 8px 25px -8px rgba(115, 103, 240, 1);
+}
+
+.common {
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  padding: 20px 10px;
+}
+
+.sidebar {
+}
+
 .sidebar-section {
-  border-bottom: #000 solid 1px;
+  border-bottom: #eaeaea solid 1px;
 }
 .sidebar-menu-item {
   text-decoration: none;
@@ -421,9 +573,10 @@ export default {
 }
 .sidebar-menu-item:hover {
   color: #000;
+  text-decoration: none;
 }
 .sidebar .active {
-  color: #00b69e;
+  color: rgba(115, 103, 240, 1);
 }
 .sidebar-menu-item img {
 }
@@ -437,9 +590,17 @@ export default {
   font-weight: 500;
 }
 .todo-item {
-  background: #eaeaea;
   padding: 10px 15px;
+  border: 1px solid #eaeaea;
+  cursor: pointer;
+  transition: all 0.2s;
 }
+.todo-item:hover {
+  background: #fafafa;
+  transform: translateY(-4px);
+  box-shadow: 0 3px 10px 0 #ccc;
+}
+
 .text-del {
   text-decoration: line-through;
 }
