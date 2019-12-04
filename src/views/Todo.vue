@@ -1,58 +1,22 @@
 <template>
-  <div class="todo-wrapper">
+  <div class="todo-wrapper mt-5">
     <div class="container">
       <div class="row common">
-        <div class="col-md-3">
-          <div class="sidebar">
-            <div class="sidebar-section mb-5 pb-5">
-              <button
-                class="btn btn-block mb-3 btn-primary"
-                data-toggle="modal"
-                data-target="#openModal"
-              >Add Task</button>
-              <a
-                href="#"
-                class="sidebar-menu-item d-flex"
-                :class="{active: currentCategory=='all'}"
-                @click="setCurrentCategory('all')"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="24px"
-                  height="24px"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                >
-                  <polygon points="12 2 2 7 12 12 22 7 12 2" />
-                  <polyline points="2 17 12 22 22 17" />
-                  <polyline points="2 12 12 17 22 12" />
-                </svg>
-                <span class="ml-3">All</span>
-              </a>
-            </div>
-            <div class="sidebar-section mb-5 pb-5">
-              <div class="sidebar-menu">
-                <h5>Filters</h5>
-                <!-- <a
-                  href="#"
-                  class="sidebar-menu-item d-flex"
-                  v-for="(filter, index) in filters"
-                  :key="index"
-                  :class="{active: currentCategory==filter}"
-                  @click="setCurrentCategory(filter)"
-                >
-                <img :src="'/static/images/f-'+(index+1)+'.svg'" alt="">
-                  <span class="ml-3">{{filter}}</span>
-                </a>-->
+        <!-- d-none d-lg-block d-md-none -->
+        <div class="col-lg-3">
+          <div class="sidebar-wrap" :class="{'s-active':isNavActive}" @click="isNavActive=false">
+            <div class="sidebar">
+              <div class="sidebar-section mb-5 pb-5">
+                <button
+                  class="btn btn-block mb-3 btn-primary"
+                  data-toggle="modal"
+                  data-target="#openModal"
+                >Add Task</button>
                 <a
                   href="#"
                   class="sidebar-menu-item d-flex"
-                  @click="setCurrentCategory('starred')"
-                  :class="{active: currentCategory=='starred'}"
+                  :class="{active: currentCategory=='all'}"
+                  @click="setCurrentCategory('all')"
                 >
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -65,146 +29,21 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                   >
-                    <polygon
-                      points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
-                    />
+                    <polygon points="12 2 2 7 12 12 22 7 12 2" />
+                    <polyline points="2 17 12 22 22 17" />
+                    <polyline points="2 12 12 17 22 12" />
                   </svg>
-                  <span class="ml-3">Starred</span>
-                </a>
-                <a
-                  href="#"
-                  class="sidebar-menu-item d-flex"
-                  @click="setCurrentCategory('important')"
-                  :class="{active: currentCategory=='important'}"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <circle cx="12" cy="12" r="10" />
-                    <line x1="12" y1="16" x2="12" y2="12" />
-                    <line x1="12" y1="8" x2="12" y2="8" />
-                  </svg>
-                  <span class="ml-3">Important</span>
-                </a>
-                <a
-                  href="#"
-                  class="sidebar-menu-item d-flex"
-                  @click="setCurrentCategory('completed')"
-                  :class="{active: currentCategory=='completed'}"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    class="feather feather-check h-6 w-6"
-                  >
-                    <polyline points="20 6 9 17 4 12" />
-                  </svg>
-                  <span class="ml-3">Completed</span>
-                </a>
-                <a
-                  href="#"
-                  class="sidebar-menu-item d-flex"
-                  @click="setCurrentCategory('trashed')"
-                  :class="{active: currentCategory=='trashed'}"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="24px"
-                    height="24px"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                  >
-                    <polyline points="3 6 5 6 21 6" />
-                    <path
-                      d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
-                    />
-                  </svg>
-                  <span class="ml-3">Trashed</span>
+                  <span class="ml-3">All</span>
                 </a>
               </div>
-            </div>
-            <!-- /.sidebar-section -->
-            <div class="sidebar-section mb-5 pb-5">
-              <div class="sidebar-menu">
-                <h5>Labels</h5>
-                <a
-                  href="#"
-                  class="sidebar-menu-item d-flex align-items-center"
-                  v-for="(label, index) in labels"
-                  :key="index"
-                  :class="{active: currentCategory==label}"
-                  @click="setCurrentCategory(label)"
-                >
-                <span class="label-circle mr-4" :class="'label-'+label"></span>
-                  <span>{{label}}</span>
-                </a>
-              </div>
-            </div>
-            <!-- /.sidebar-section -->
-          </div>
-        </div>
-        <div class="col-md-9">
-          <div class="todo-main">
-            <div class="input-group input-group-sm mb-3">
-              <input type="text" class="form-control" placeholder="Search" v-model="search" />
-            </div>
-          </div>
-          <div class="todos">
-            <div
-              class="todo-item"
-              v-for="todo in searchTodos"
-              :key="todo.id"
-              @click="updateTodo(todo.id)"
-              data-toggle="modal"
-              data-target="#openModal"
-            >
-              <div class="todo-header d-flex align-items-center justify-content-between">
-                <div class="d-flex align-items-center">
-                  <input
-                    type="checkbox"
-                    :value="todo.id"
-                    :checked="isFilter(todo.filters,'completed')"
-                    @change="setFilter(todo.id,'completed')"
-                    @click.self.stop
-                  />
-                  <span
-                    class="todo-title mr-3 ml-2"
-                    :class="{'text-del':isFilter(todo.filters,'completed')}"
-                  >{{todo.title}}</span>
-                  <div class="todo-labels d-flex">
-                    <span
-                      class="badge badge-pill badge-light mr-1 d-flex align-items-center"
-                      v-for="label in todo.labels"
-                      :key="label"
-                    >
-                    <span class="label-circle label-dot mr-1" :class="'label-'+label"></span>
-                    {{label}}</span>
-                  </div>
-                </div>
-                <div class="todo-filters d-flex" @click.stop="updateTodo(todo.id)">
-                  <span
-                    class="todo-filter"
-                    :class="{'text-warning': isFilter(todo.filters,'starred')}"
-                    @click="setFilter(todo.id,'starred')"
+              <div class="sidebar-section mb-5 pb-5">
+                <div class="sidebar-menu">
+                  <h5>Filters</h5>
+                  <a
+                    href="#"
+                    class="sidebar-menu-item d-flex"
+                    @click="setCurrentCategory('starred')"
+                    :class="{active: currentCategory=='starred'}"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -221,11 +60,13 @@
                         points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
                       />
                     </svg>
-                  </span>
-                  <span
-                    class="todo-filter"
-                    :class="{'text-success': isFilter(todo.filters,'important')}"
-                    @click="setFilter(todo.id,'important')"
+                    <span class="ml-3">Starred</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="sidebar-menu-item d-flex"
+                    @click="setCurrentCategory('important')"
+                    :class="{active: currentCategory=='important'}"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -242,11 +83,35 @@
                       <line x1="12" y1="16" x2="12" y2="12" />
                       <line x1="12" y1="8" x2="12" y2="8" />
                     </svg>
-                  </span>
-                  <span
-                    class="filter-todo"
-                    @click="setFilter(todo.id,'trashed')"
-                    v-if="todo.filters.indexOf('trashed')==-1"
+                    <span class="ml-3">Important</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="sidebar-menu-item d-flex"
+                    @click="setCurrentCategory('completed')"
+                    :class="{active: currentCategory=='completed'}"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="24px"
+                      height="24px"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      class="feather feather-check h-6 w-6"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <span class="ml-3">Completed</span>
+                  </a>
+                  <a
+                    href="#"
+                    class="sidebar-menu-item d-flex"
+                    @click="setCurrentCategory('trashed')"
+                    :class="{active: currentCategory=='trashed'}"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -264,11 +129,167 @@
                         d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
                       />
                     </svg>
-                  </span>
+                    <span class="ml-3">Trashed</span>
+                  </a>
                 </div>
               </div>
-              <div class="todo-body" :class="{'text-del':isFilter(todo.filters,'completed')}">
-                <p>{{todo.description}}</p>
+              <!-- /.sidebar-section -->
+              <div class="sidebar-section mb-5 pb-5">
+                <div class="sidebar-menu">
+                  <h5>Labels</h5>
+                  <a
+                    href="#"
+                    class="sidebar-menu-item d-flex align-items-center"
+                    v-for="(label, index) in labels"
+                    :key="index"
+                    :class="{active: currentCategory==label}"
+                    @click="setCurrentCategory(label)"
+                  >
+                    <span class="label-circle mr-4" :class="'label-'+label"></span>
+                    <span>{{label}}</span>
+                  </a>
+                </div>
+              </div>
+              <!-- /.sidebar-section -->
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <div class="todo-main">
+            <div
+              class="input-group input-group-sm mb-2 p-2 d-flex align-items-center"
+              style="border:#eaeaea solid 1px"
+            >
+              <span class="mr-2 d-md-block d-lg-none" @click="isNavActive=!isNavActive">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24px"
+                  height="24px"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <line x1="3" y1="12" x2="21" y2="12" />
+                  <line x1="3" y1="6" x2="21" y2="6" />
+                  <line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </span>
+              <input
+                type="text"
+                class="form-control"
+                placeholder="Search"
+                v-model="search"
+                style="border:none;"
+              />
+            </div>
+            <div class="todos">
+              <div
+                class="todo-item"
+                v-for="todo in searchTodos"
+                :key="todo.id"
+                @click="updateTodo(todo.id)"
+                data-toggle="modal"
+                data-target="#openModal"
+              >
+                <div
+                  class="todo-header d-flex align-items-center justify-content-between flex-wrap"
+                >
+                  <div class="d-flex align-items-center flex-wrap">
+                    <input
+                      type="checkbox"
+                      :value="todo.id"
+                      :checked="isFilter(todo.filters,'completed')"
+                      @change="setFilter(todo.id,'completed')"
+                      @click.self.stop
+                    />
+                    <span
+                      class="todo-title mr-3 ml-2"
+                      :class="{'text-del':isFilter(todo.filters,'completed')}"
+                    >{{todo.title}}</span>
+                    <div class="todo-labels d-flex flex-wrap">
+                      <span
+                        class="badge badge-pill badge-light mr-1 d-flex align-items-center"
+                        v-for="label in todo.labels"
+                        :key="label"
+                      >
+                        <span class="label-circle label-dot mr-1" :class="'label-'+label"></span>
+                        {{label}}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="todo-filters d-flex" @click.stop="updateTodo(todo.id)">
+                    <span
+                      class="todo-filter"
+                      :class="{'text-warning': isFilter(todo.filters,'starred')}"
+                      @click="setFilter(todo.id,'starred')"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24px"
+                        height="24px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polygon
+                          points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+                        />
+                      </svg>
+                    </span>
+                    <span
+                      class="todo-filter"
+                      :class="{'text-success': isFilter(todo.filters,'important')}"
+                      @click="setFilter(todo.id,'important')"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24px"
+                        height="24px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <circle cx="12" cy="12" r="10" />
+                        <line x1="12" y1="16" x2="12" y2="12" />
+                        <line x1="12" y1="8" x2="12" y2="8" />
+                      </svg>
+                    </span>
+                    <span
+                      class="filter-todo"
+                      @click="setFilter(todo.id,'trashed')"
+                      v-if="todo.filters.indexOf('trashed')==-1"
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24px"
+                        height="24px"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                      >
+                        <polyline points="3 6 5 6 21 6" />
+                        <path
+                          d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+                        />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+                <div class="todo-body" :class="{'text-del':isFilter(todo.filters,'completed')}">
+                  <p>{{todo.description}}</p>
+                </div>
               </div>
             </div>
           </div>
@@ -412,7 +433,8 @@ export default {
         labels: []
       },
       isUpdate: false,
-      search: ""
+      search: "",
+      isNavActive: false
     };
   },
   mounted() {
@@ -513,14 +535,13 @@ export default {
 </script>
 
 <style>
-
-.label-circle{
+.label-circle {
   width: 10px;
   height: 10px;
   border: #000 solid 2px;
   border-radius: 9999px;
 }
-.label-dot{
+.label-dot {
   /* width: 100% !important; */
   /* width: 10px;
   height: 100% !important; */
@@ -528,21 +549,21 @@ export default {
   height: 4px;
   display: block !important;
 }
-    /* --vs-primary: 115,103,240;
+/* --vs-primary: 115,103,240;
     --vs-success: 40,199,111;
     --vs-danger: 234,84,85;
     --vs-warning: 255,159,67; */
-.label-backend{
-  border-color: rgb(115,103,240);
+.label-backend {
+  border-color: rgb(115, 103, 240);
 }
-.label-frontend{
-  border-color: rgb(255,159,67);
+.label-frontend {
+  border-color: rgb(255, 159, 67);
 }
-.label-doc{
-  border-color: rgb(40,199,111);
+.label-doc {
+  border-color: rgb(40, 199, 111);
 }
-.label-bug{
-  border-color: rgb(234,84,85);
+.label-bug {
+  border-color: rgb(234, 84, 85);
 }
 
 .btn-primary {
@@ -558,9 +579,17 @@ export default {
   border: 1px solid #eaeaea;
   border-radius: 10px;
   padding: 20px 10px;
+  height: 600px;
+  position: relative;
+  /* overflow-y: scroll; */
 }
 
+.sidebar-wrap {
+  /* visibility: hidden; */
+}
 .sidebar {
+  height: 570px;
+  overflow-y: scroll;
 }
 
 .sidebar-section {
@@ -581,6 +610,10 @@ export default {
 .sidebar-menu-item img {
 }
 
+.todos {
+  height: 500px;
+  overflow-y: scroll;
+}
 .todo-header {
   /* background: red;  */
   padding: 5px 10px;
@@ -646,5 +679,25 @@ ul li ul:hover {
 ul li ul li {
   clear: both;
   width: 100%;
+}
+
+@media (max-width: 991px) {
+  .sidebar-wrap {
+    position: absolute;
+    /* background: transparent; */
+    background: rgba(0, 0, 0, .2);
+    z-index: 111;
+    top: 0;
+    left: 0;    
+    width: 0%;
+    /* transition: 0.2s all; */
+  }
+  .sidebar{
+    max-width: 220px;
+    background: #fff;
+  }
+  .s-active {
+    width: 100%;
+  }
 }
 </style>
