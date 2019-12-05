@@ -694,10 +694,14 @@ ul li ul li {
   }
   .sidebar{
     max-width: 220px;
-    background: #fff;
+    background: #fff;    
   }
   .s-active {
     width: 100%;
+  }
+  .s-active .sidebar{
+    padding-right: 10px;
+    padding-top: 10px;
   }
 }
 </style>
